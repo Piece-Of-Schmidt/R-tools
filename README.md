@@ -4,9 +4,9 @@ Simple and sometimes not too simple funcs that helped me working with text data 
 
 ### progrss.R
 
-This function will allow you to track the progress of your loop. Whether you are using a simple for loop or an sapply or lapply function, ´progress.indicate()´ lets you know how fast your code is running. The best part is, you don't need to install any packages!
+This function will allow you to track the progress of your loop. Whether you are using a simple for loop or an sapply or lapply function, `progress.indicate()` lets you know how fast your code is running. The best part is, you don't need to install any packages!
 
-To use this function, you will first need to initialize a progress tracker. To do so, simply type ´progress.initialize(object_you_are_iterating_over)´. Then, you can insert ´progress.indicate()´ into your loop. The progrss.R file shows two examples of how this could be done.
+To use this function, you will first need to initialize a progress tracker. To do so, simply type ```progress.initialize(object_you_are_iterating_over)```. Then, you can insert ´progress.indicate()´ into your loop. The progrss.R file shows two examples of how this could be done.
 
 ### similar_texts.R
 
