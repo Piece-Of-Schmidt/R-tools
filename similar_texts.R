@@ -24,7 +24,7 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T, keepDFM=
   for(package in c("quanteda", "dplyr", "proxyC", "Matrix")){
     if(!require(package, character.only = T, quietly = T)){
       install = as.logical(as.numeric(readline(paste("  Package", package, "is not installed but required. Shall it be installed now? (NO: 0, YES: 1)  "))))
-      if(install) install.packages("xlsx") else break
+      if(install) install.packages(package) else break
     }
   }
   
@@ -71,7 +71,7 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T, keepDFM=
 
 texts = c("Buerger muessen sich nicht nur das Virus vom Leib halten, sondern auch Kriminelle, die an ihr Geld wollen. Das sind die neuen Fallen.",
           "Die Tuerkei rutscht in die Rezession. Schuld ist auch die starrsinnige Politik des Praesidenten. Erdogan hat's gegeben, Erdogan hat's genommen.",
-          "Studie: 113 Millionen Menschen hungerten 2018 wegen akuter Krisen. Mehr als 113 Millionen Menschen haben einem Bericht zufolge 2018 Hunger leiden müssen.",
+          "Studie: 113 Millionen Menschen hungerten 2018 wegen akuter Krisen. Mehr als 113 Millionen Menschen haben einem Bericht zufolge 2018 Hunger leiden mÃ¼ssen.",
           "Unternehmen brauchen topausgebildete Fach- und Fuehrungskraefte, die den Wandel mitgestalten. Digitalisierungsbeauftragte koennen dazu beitragen.",
           "Nur wenige Smartphone-Nutzer verwenden die aktuellste Version des Betriebssystems. Der US-Konzern will nun die Kontrolle ueber die Aktualisierungen uebernehmen.",
           "Die Deutschen besitzen rund 6,5 Prozent der weltweiten Bestaende. Allein in den vergangenen zwei Jahren kamen 250 Tonnen dazu. Die Liebe der Deutschen zu ihren Autos",
