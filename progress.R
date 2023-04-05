@@ -99,14 +99,3 @@ result = lapply(object, function(x){
   x
 })
 
-# -------------------------------------------------------------------------
-
-mat = matrix(1:20,4)
-
-progress.initialize(object)
-result = apply(mat, 1, function(row){
-  Sys.sleep(0.05)
-  progress.indicate()
-  row*10
-})
-
