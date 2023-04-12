@@ -59,7 +59,11 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T){
   # cat("\nTo further analyse similarities use:\n  dups = which(output > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
   
   # return invisibly
-  invisible(list(duplicates = rownames(comp_winners), locations = comp_winners, simils = simils, dfm = dtm))
+  invisible(list(duplicates = rownames(comp_winners),
+                 locations = comp_winners,
+                 not_duplicated_texts = names(texts)[! names(texts) %in% rownames(comp_winners)],
+                 simils = simils,
+                 dfm = dtm))
 }
 
 
