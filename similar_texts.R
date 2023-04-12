@@ -11,10 +11,12 @@
 #'compare texts with the help on ngrams and a quanteda document feature matrix. Documents that share a specific amount of ngrams are expected to be duplicates
 #'@param texts text object, either as names vector or named list
 #'@param ngram ngram values. Single values or vector of numbers allowed 
+#'@param stopwords stopwords to be excluded prior to text comparison (as vector)
+#'@param min_occ how often shall an ngram occure in the whole corpus so it is considered in the comparison matrix
 #'@param thresh relative amount of same ngram values that is evaluated as too high
 #'@param print_dups if TRUE duplicated texts are printed for evaluation (the larger the console window the longer the printed texts are)
 #'
-find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T){
+find_similar_texts = function(texts, ngram=4, stopwords=NULL, min_occ=1, thresh=0.5, print_dups=T){
   
   # safety belt
   if(is.null(names(texts)) | any(duplicated(names(texts)))) stop("texts must have unique names")
@@ -29,17 +31,19 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T){
   
   cat("Calculate tokens (docs = ", length(texts), ", ngram = ", ngram, ", thresh = ", thresh, ")", sep="")
   toks = tokens(unlist(texts), remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = , remove_separators = T) %>%
+    {if(!is.null(stopwords)) tokens_remove(., stopwords) else .} %>%
     tokens_ngrams(., ngram)
   
   cat("\nCalculate doc similarity\n")
   # create DTM
-  dtm = dfm(toks)
+  dtm = dfm(toks) %>%
+    dfm_trim(., min_termfreq=min_occ)
   
   # calculate similarities of documents
   simils = dtm %>%
     Matrix(., sparse = TRUE) %>%
     simil(., margin=1)
-
+  
   # find which documents are most similar
   comp_winners = which(simils>=thresh, arr.ind=TRUE)
   comp_winners = comp_winners[comp_winners[,1]!=comp_winners[,2],] # exclude results for docs matchings against itself
@@ -55,10 +59,9 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T){
     )
   }
   
-  # print small code that helps further investigate the function's output 
-  # cat("\nTo further analyse similarities use:\n  dups = which(output > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
-  
-  # return invisibly
+  # cat("\nTo further analyse similarities use:\n  dups = which(simils > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
+
+  # return comparison matrix invisibly
   invisible(list(duplicates = rownames(comp_winners),
                  locations = comp_winners,
                  not_duplicated_texts = names(texts)[! names(texts) %in% rownames(comp_winners)],
