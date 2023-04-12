@@ -94,5 +94,5 @@ names(texts) = c("5YTP-8681-JBK9-2014-00000-00",
                  "5VYH-7CS1-DY2B-S0BB-00000-00",
                  "5YKR-34T1-JBK9-24BY-00000-00")
 
-out = find_similar_texts(texts, thresh = 0.3, keepDFM = T)
+out = find_similar_texts(texts, thresh = 0.3)
 out
