@@ -13,9 +13,8 @@
 #'@param ngram ngram values. Single values or vector of numbers allowed 
 #'@param thresh relative amount of same ngram values that is evaluated as too high
 #'@param print_dups if TRUE duplicated texts are printed for evaluation (the larger the console window the longer the printed texts are)
-#'@param keepDTM if TRUE the internally created document feature matrix is saved to the environment
 #'
-find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T, keepDFM=F){
+find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T){
   
   # safety belt
   if(is.null(names(texts)) | any(duplicated(names(texts)))) stop("texts must have unique names")
@@ -33,16 +32,16 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T, keepDFM=
     tokens_ngrams(., ngram)
   
   cat("\nCalculate doc similarity\n")
-  # create DTM. Save to global environment if desired
-  dtm = dfm(toks); if(keepDFM) dtm <<- dtm
+  # create DTM
+  dtm = dfm(toks)
   
   # calculate similarities of documents
-  comp = dtm %>%
+  simils = dtm %>%
     Matrix(., sparse = TRUE) %>%
     simil(., margin=1)
 
   # find which documents are most similar
-  comp_winners = which(comp>=thresh, arr.ind=TRUE)
+  comp_winners = which(simils>=thresh, arr.ind=TRUE)
   comp_winners = comp_winners[comp_winners[,1]!=comp_winners[,2],] # exclude results for docs matchings against itself
 
   # print head of texts for evaluation
@@ -57,10 +56,10 @@ find_similar_texts = function(texts, ngram=4, thresh=0.5, print_dups=T, keepDFM=
   }
   
   # print small code that helps further investigate the function's output 
-  cat("\nTo further analyse similarities use:\n  dups = which(output > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
+  # cat("\nTo further analyse similarities use:\n  dups = which(output > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
   
-  # return comparison matrix invisibly
-  invisible(comp)
+  # return invisibly
+  invisible(list(duplicates = rownames(comp_winners), locations = comp_winners, simils = simils, dfm = dtm))
 }
 
 
