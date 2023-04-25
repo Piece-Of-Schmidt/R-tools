@@ -61,7 +61,7 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
     cat("\nSimilar Texts:\n")
     print(
       data.frame(id = dup_ids,
-                 text = strtrim(texts[dup_ids], getOption("width")-max(nchar(dup_ids))-5 ),
+                 text = substr(texts[dup_ids], 1, getOption("width")-max(nchar(dup_ids))-5 ),
                  row.names = NULL)
     )
   }
