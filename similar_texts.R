@@ -9,14 +9,15 @@
 #'find_similar_texts
 #'
 #'compare texts with the help on ngrams and a quanteda document feature matrix. Documents that share a specific amount of ngrams are expected to be duplicates
-#'@param texts text object, either as names vector or named list
+#'@param texts text object, either as named vector or named list
 #'@param ngram ngram values. Single values or vector of numbers allowed 
+#'@param max_text_length if desired, texts are shrinked to length max_text_length. This makes the code run faster, at the price of losing arguably important information 
 #'@param stopwords stopwords to be excluded prior to text comparison (as vector)
 #'@param min_occ how often shall an ngram occure in the whole corpus so it is considered in the comparison matrix
 #'@param thresh relative amount of same ngram values that is evaluated as too high
 #'@param print_dups if TRUE duplicated texts are printed for evaluation (the larger the console window the longer the printed texts are)
 #'
-find_similar_texts = function(texts, ngram=4, stopwords=NULL, min_occ=1, thresh=0.5, print_dups=T){
+find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NULL, min_occ=1, thresh=0.5, print_dups=T){
   
   # safety belt
   if(is.null(names(texts)) | any(duplicated(names(texts)))) stop("texts must have unique names")
@@ -28,6 +29,9 @@ find_similar_texts = function(texts, ngram=4, stopwords=NULL, min_occ=1, thresh=
       if(install) install.packages(package) else break
     }
   }
+  
+  # shorten texts if desired
+  if(!is.null(max_text_length)) texts = substr(unlist(texts), 1, max_text_length)
   
   cat("Calculate tokens (docs = ", length(texts), ", ngram = ", ngram, ", thresh = ", thresh, ")", sep="")
   toks = tokens(unlist(texts), remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = , remove_separators = T) %>%
