@@ -32,7 +32,7 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
   
   # shorten texts if desired
   if(!is.null(max_text_length)){
-    cat("\nShorten Texts to length", max_text_length,"\n")
+    cat("\nShorten Texts to", max_text_length,"characters\n")
     texts = substr(unlist(texts), 1, max_text_length)
   }
   
