@@ -31,7 +31,10 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
   }
   
   # shorten texts if desired
-  if(!is.null(max_text_length)) texts = substr(unlist(texts), 1, max_text_length)
+  if(!is.null(max_text_length)){
+    cat("\nShorten Texts to length", max_text_length,"\n")
+    texts = substr(unlist(texts), 1, max_text_length)
+  }
   
   cat("Calculate tokens (docs = ", length(texts), ", ngram = ", ngram, ", thresh = ", thresh, ")", sep="")
   toks = tokens(unlist(texts), remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = , remove_separators = T) %>%
