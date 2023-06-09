@@ -39,11 +39,12 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
     {if(!is.null(stopwords)) tokens_remove(., stopwords) else .} %>%
     tokens_ngrams(., ngram)
   
-  if(print) cat("\nCalculate doc similarity\n")
-  # create DTM
+  if(print) cat("\nCreate DFM\n")
+  # create DFM
   dtm = dfm(toks) %>%
     dfm_trim(., min_termfreq=min_occ)
   
+  if(print) cat("\nCalculate doc similarity\n")
   # calculate similarities of documents
   simils = textstat_simil(dtm, margin="documents", method="cosine")
 
