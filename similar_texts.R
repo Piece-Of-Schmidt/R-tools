@@ -11,14 +11,14 @@
 #'compare texts with the help on ngrams and a quanteda document feature matrix. Documents that share a specific amount of ngrams are expected to be duplicates
 #'@param texts text object, either as named vector or named list
 #'@param ngram ngram values. Single values or vector of numbers allowed 
-#'@param max_text_length if desired, texts are shrinked to length max_text_length. This makes the code run faster, at the price of losing arguably important information 
+#'@param max_text_length if desired, all texts are shrinked to max_text_length tokens. This makes the code run faster, at the price of losing arguably important information 
 #'@param stopwords stopwords to be excluded prior to text comparison (as vector)
 #'@param min_occ how often shall an ngram occure in the whole corpus so it is considered in the comparison matrix
 #'@param thresh relative amount of same ngram values that is evaluated as too high
 #'@param keep_first if duplicates are found, the first one of them is kept, respectively
 #'@param print if TRUE progress and duplicated texts are printed for evaluation (the larger the console window the longer the printed texts are)
 #'
-find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NULL, min_occ=1, thresh=0.5, keep_first=T, print=T){
+find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NULL, min_occ=1, thresh=0.8, keep_first=T, print=T){
   
   # safety belt
   if(is.null(names(texts)) | any(duplicated(names(texts)))) stop("texts must have unique names")
@@ -31,15 +31,10 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
     }
   }
   
-  # shorten texts if desired
-  if(!is.null(max_text_length)){
-    if(print) cat("\nShorten Texts to", max_text_length,"characters\n")
-    texts = substr(unlist(texts), 1, max_text_length)
-  }
-  
   if(print) cat("Calculate tokens (docs = ", length(texts), ", ngram = ", ngram, ", thresh = ", thresh, ")", sep="")
   
   toks = tokens(unlist(texts), remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = , remove_separators = T) %>%
+    {if(!is.null(max_text_length)) toks = tokens_select(., endpos = max_text_length) else .} %>%
     tokens_tolower() %>%
     {if(!is.null(stopwords)) tokens_remove(., stopwords) else .} %>%
     tokens_ngrams(., ngram)
