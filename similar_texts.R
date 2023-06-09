@@ -15,15 +15,16 @@
 #'@param stopwords stopwords to be excluded prior to text comparison (as vector)
 #'@param min_occ how often shall an ngram occure in the whole corpus so it is considered in the comparison matrix
 #'@param thresh relative amount of same ngram values that is evaluated as too high
+#'@param keep_first if duplicates are found, the first one of them is kept, respectively
 #'@param print_dups if TRUE duplicated texts are printed for evaluation (the larger the console window the longer the printed texts are)
 #'
-find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NULL, min_occ=1, thresh=0.5, print_dups=T){
+find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NULL, min_occ=1, thresh=0.8, keep_first=T, print_dups=T){
   
   # safety belt
   if(is.null(names(texts)) | any(duplicated(names(texts)))) stop("texts must have unique names")
   
   # load and install packages if needed
-  for(package in c("quanteda", "dplyr", "proxyC", "Matrix")){
+  for(package in c("quanteda", "dplyr", "quanteda.textstats")){
     if(!require(package, character.only = T, quietly = T)){
       install = as.logical(as.numeric(readline(paste("  Package", package, "is not installed but required. Shall it be installed now? (NO: 0, YES: 1)  "))))
       if(install) install.packages(package) else break
@@ -37,7 +38,9 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
   }
   
   cat("Calculate tokens (docs = ", length(texts), ", ngram = ", ngram, ", thresh = ", thresh, ")", sep="")
+  
   toks = tokens(unlist(texts), remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = , remove_separators = T) %>%
+    tokens_tolower() %>%
     {if(!is.null(stopwords)) tokens_remove(., stopwords) else .} %>%
     tokens_ngrams(., ngram)
   
@@ -47,14 +50,12 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
     dfm_trim(., min_termfreq=min_occ)
   
   # calculate similarities of documents
-  simils = dtm %>%
-    Matrix(., sparse = TRUE) %>%
-    simil(., margin=1)
-  
+  simils = textstat_simil(dtm, margin="documents", method="cosine")
+
   # find which documents are most similar
   comp_winners = which(simils>=thresh, arr.ind=TRUE)
   comp_winners = comp_winners[comp_winners[,1]!=comp_winners[,2],] # exclude results for docs matchings against itself
-
+  
   # print head of texts for evaluation
   if(print_dups & length(comp_winners) > 0){
     dup_ids = sort(unique(rownames(comp_winners)))
@@ -67,11 +68,14 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
   }
   
   # cat("\nTo further analyse similarities use:\n  dups = which(simils > thresh, arr.ind=TRUE)\n  dups[dups[,1] != dups[,2],]\n")
-
+  
   # return comparison matrix invisibly
+  if(keep_first) not_dups = names(texts)[! names(texts) %in% rownames(unique(t(apply(comp_winners, 1, sort))))]
+  else not_dups = names(texts)[! names(texts) %in% rownames(comp_winners)]
+  
   invisible(list(duplicates = rownames(comp_winners),
                  locations = comp_winners,
-                 not_duplicated_texts = names(texts)[! names(texts) %in% rownames(comp_winners)],
+                 not_duplicated_texts = not_dups,
                  simils = simils,
                  dfm = dtm))
 }
