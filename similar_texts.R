@@ -49,7 +49,7 @@ find_similar_texts = function(texts, ngram=4, max_text_length=NULL, stopwords=NU
   simils = textstat_simil(dtm, margin="documents", method="cosine")
 
   # find which documents are most similar
-  comp_winners = which(simils>=thresh, arr.ind=TRUE)
+  comp_winners = which(as.matrix(simils)>=thresh, arr.ind=TRUE)
   comp_winners = comp_winners[comp_winners[,1]!=comp_winners[,2],] # exclude results for docs matchings against itself
   
   # print head of texts for evaluation
