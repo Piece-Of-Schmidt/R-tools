@@ -22,7 +22,7 @@ progress.initialize = function(runner){
           round((2/3)*getOption("width"))%%2,
         env=progress.environment) # width of prgress bar (even number forced)
   local(scaling <- width/length(runner), env=progress.environment) # scalar for each iteration
-  local(index_to_indicate_progess <- 1, env=progress.environment) # start index
+  local(index_to_indicate_progress <- 1, env=progress.environment) # start index
   
   invisible(TRUE)
 }
@@ -37,26 +37,26 @@ progress.indicate = function(){
 
   # load params from environment
   runner = local(runner, env=progress.environment)
-  index_to_indicate_progess = local(index_to_indicate_progess, env=progress.environment)
+  index_to_indicate_progress = local(index_to_indicate_progress, env=progress.environment)
   width = local(width, env=progress.environment)
   scaling = local(scaling, env=progress.environment)
   
   # calculate progress
-  progress = paste(floor(100*index_to_indicate_progess/length(runner)), "%  ")
+  progress = paste(floor(100*index_to_indicate_progress/length(runner)), "%  ")
   
   # print progress bar
   cat("\r",
-      strrep("=", round(index_to_indicate_progess * scaling)),
-      strrep(" ", round(width - index_to_indicate_progess*scaling)),
+      strrep("=", round(index_to_indicate_progress * scaling)),
+      strrep(" ", round(width - index_to_indicate_progress*scaling)),
       " | ",
       progress, sep="")
   
   # update running parameter
-  local(index_to_indicate_progess <- index_to_indicate_progess+1, env=progress.environment)
+  local(index_to_indicate_progress <- index_to_indicate_progress+1, env=progress.environment)
   
   # if done: reset running variable
-  if(local(index_to_indicate_progess, env=progress.environment) == length(runner)+1){
-    local(index_to_indicate_progess <- 1, env=progress.environment)
+  if(local(index_to_indicate_progress, env=progress.environment) == length(runner)+1){
+    local(index_to_indicate_progress <- 1, env=progress.environment)
     cat("\n")
   }
   
