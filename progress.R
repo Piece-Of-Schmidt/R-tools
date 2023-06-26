@@ -23,8 +23,8 @@ progress.initialize = function(runner, track_time=F){
         env=progress.environment) # width of prgress bar (even number forced)
   local(scaling <- width/length(runner), env=progress.environment) # scalar for each iteration
   local(index_to_indicate_progress <- 1, env=progress.environment) # start index
-  local(startTime <- Sys.time(), env=progress.environment) # track time?
   local(track_time <- track_time, env=progress.environment) # track time?
+  if(track_time) local(startTime <- Sys.time(), env=progress.environment)  
   
   invisible(TRUE)
 }
