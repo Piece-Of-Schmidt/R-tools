@@ -11,7 +11,7 @@
 #'initializes progress bar
 #'@param runner object that the loop is performed on
 #'
-progress.initialize = function(runner){
+progress.initialize = function(runner, track_time=F){
   
   # create new environment
   progress.environment <<- new.env()
@@ -23,6 +23,8 @@ progress.initialize = function(runner){
         env=progress.environment) # width of prgress bar (even number forced)
   local(scaling <- width/length(runner), env=progress.environment) # scalar for each iteration
   local(index_to_indicate_progress <- 1, env=progress.environment) # start index
+  local(startTime <- Sys.time(), env=progress.environment) # track time?
+  local(track_time <- track_time, env=progress.environment) # track time?
   
   invisible(TRUE)
 }
@@ -34,15 +36,22 @@ progress.initialize = function(runner){
 #'print progress of a loop, sapply oder lapply function
 #'
 progress.indicate = function(){
-
+  
   # load params from environment
   runner = local(runner, env=progress.environment)
-  index_to_indicate_progress = local(index_to_indicate_progress, env=progress.environment)
   width = local(width, env=progress.environment)
   scaling = local(scaling, env=progress.environment)
+  index_to_indicate_progress = local(index_to_indicate_progress, env=progress.environment)
+  track_time = local(track_time, env=progress.environment)
   
   # calculate progress
   progress = paste(floor(100*index_to_indicate_progress/length(runner)), "%  ")
+  
+  # track time if desired
+  if(track_time && index_to_indicate_progress == 1){
+    diff = difftime(Sys.time(), local(startTime, env=progress.environment))*length(runner)
+    cat("Approx. Time until finish:", round(difftime(Sys.time()+diff, startTime),2), attr(difftime(Sys.time()+diff, startTime), "units"),"\n")
+  }
   
   # print progress bar
   cat("\r",
@@ -55,7 +64,7 @@ progress.indicate = function(){
   local(index_to_indicate_progress <- index_to_indicate_progress+1, env=progress.environment)
   
   # if done: reset running variable
-  if(local(index_to_indicate_progress, env=progress.environment) == length(runner)+1){
+  if(index_to_indicate_progress == length(runner)+1){
     local(index_to_indicate_progress <- 1, env=progress.environment)
     cat("\n")
   }
@@ -99,3 +108,14 @@ result = lapply(object, function(x){
   x
 })
 
+# -------------------------------------------------------------------------
+
+
+object = 1:10
+
+progress.initialize(object, T)
+result = lapply(object, function(x){
+  Sys.sleep(0.5)
+  progress.indicate()
+  x
+})
