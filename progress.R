@@ -31,10 +31,6 @@ progress.initialize = function(runner, track_time=F){
 
 # -------------------------------------------------------------------------
 
-#'progress.indicate
-#'
-#'print progress of a loop, sapply oder lapply function
-#'
 progress.indicate = function(){
   
   # load params from environment
@@ -44,14 +40,26 @@ progress.indicate = function(){
   index_to_indicate_progress = local(index_to_indicate_progress, env=progress.environment)
   track_time = local(track_time, env=progress.environment)
   
-  # calculate progress
-  progress = paste(floor(100*index_to_indicate_progress/length(runner)), "%  ")
-  
   # track time if desired
   if(track_time && index_to_indicate_progress == 1){
-    diff = difftime(Sys.time(), local(startTime, env=progress.environment))*length(runner)
-    cat("Approx. Time until finish:", round(difftime(Sys.time()+diff, startTime),2), attr(difftime(Sys.time()+diff, startTime), "units"),"\n")
+    time_diff = difftime(Sys.time(), local(startTime, env=progress.environment), units = "secs")*(length(runner)-1)
+    if (time_diff >= 86400) {  # 86400 secs == 1 day
+      time_diff <- time_diff/86400
+      attr(time_diff, "units") <- "days"
+    } else if (time_diff >= 3600) {  # 3600 secs == 1 h
+      time_diff <- time_diff/3600
+      attr(time_diff, "units") <- "hours"
+    } else if (time_diff >= 60) {  # 60 secs == 1 min
+      time_diff <- time_diff/60
+      attr(time_diff, "units") <- "mins"
+    } else {
+      attr(time_diff, "units") <- "secs"
+    }
+    cat("Approx. Time until finish:", round(time_diff,2), attr(time_diff, "units"),"\n")
   }
+  
+  # calculate progress
+  progress = paste(floor(100*index_to_indicate_progress/length(runner)), "%  ")
   
   # print progress bar
   cat("\r",
@@ -64,7 +72,7 @@ progress.indicate = function(){
   local(index_to_indicate_progress <- index_to_indicate_progress+1, env=progress.environment)
   
   # if done: reset running variable
-  if(index_to_indicate_progress == length(runner)+1){
+  if(local(index_to_indicate_progress, env=progress.environment) == length(runner)+1){
     local(index_to_indicate_progress <- 1, env=progress.environment)
     cat("\n")
   }
