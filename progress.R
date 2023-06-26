@@ -10,7 +10,7 @@
 #'
 #'initializes progress bar
 #'@param runner object that the loop is performed on
-#'@param track_time if T, progress.indicate() returns approx. duration of the loop. Note: To work properly, progress.indicate() has to be the last or second to last function call in the loop if track_time == T
+#'@param track_time if T, progress.indicate() returns approx. duration of the loop. Note: Only works well with small iterations. To work properly, progress.indicate() has to be the last or second to last function call in the loop if track_time == T
 #'
 progress.initialize = function(runner, track_time=F){
   
