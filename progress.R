@@ -32,6 +32,10 @@ progress.initialize = function(runner, track_time=F){
 
 # -------------------------------------------------------------------------
 
+#'progress.indicate
+#'
+#'plots progress bar
+#'
 progress.indicate = function(){
   
   # load params from environment
